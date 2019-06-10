@@ -1,5 +1,11 @@
 {% extends "bootstrap/base.html" %}
 
+{% block scripts %}
+{{ super() }}
+{{ moment.include_moment() }}
+{{ moment.locale('GR') }}
+{% endblock %}
+
 {% block title %}Flasky{% endblock %}
 
 {% block head %}
