@@ -10,6 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_mail import Mail
 from flask_mail import Message
+from threading import Thread
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -60,14 +61,18 @@ class NewForm(FlaskForm):
     name = StringField('What is your name?', validators= [DataRequired()])
     submit = SubmitField('Submit')
 
+def send_async_mail(app, msg):
+    with app.app_context():
+        mail.send(msg)
+
 def send_mail(to, subject, template, **kwargs):
     msg = Message(app.config['FLASKY_MAIL_SUBJECT_PREFIX'] + subject,
                   sender=app.config['FLASKY_MAIL_SENDER'], recipients=[to])
     msg.body = render_template(template + '.txt', **kwargs)
     msg.html = render_template(template + '.html', **kwargs)
-    print("msg body is:{}".format(msg.body))
-    print("msg html is:{}".format(msg.html))
-    mail.send(msg)
+    thr = Thread(target=send_async_mail, args=(app, msg))
+    thr.start()
+    return thr
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
@@ -79,14 +84,9 @@ def index():
             db.session.add(user)
             db.session.commit()
             session['known'] = False
-            print("app.config['FLASKY_ADMIN'] is:", app.config['FLASKY_ADMIN'] )
-            print("app.config['MAIL_USERNAME'] is:", app.config['MAIL_USERNAME'] )
-            print("app.config['MAIL_PASSWORD'] is:", app.config['MAIL_PASSWORD'] )
             if app.config['FLASKY_ADMIN']:
-                print("begin to send mail")
                 send_mail(app.config['FLASKY_ADMIN'], 'New User',
                           'mail/new_user', user=user)
-                print("Mail has sent")
         else:
             session['known'] = True
         session['name'] = form.name.data
