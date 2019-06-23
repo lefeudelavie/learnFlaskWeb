@@ -5,12 +5,17 @@ verify_ssl = true
 
 [dev-packages]
 pylint = "*"
+ipython = "*"
+pysnooper = "*"
 
 [packages]
 flask = "*"
 flask-sqlalchemy = "*"
 flask-migrate = "*"
 flask-mail = "*"
+flask-bootstrap = "*"
+flask-moment = "*"
+flask-wtf = "*"
 
 [requires]
 python_version = "3.7"
