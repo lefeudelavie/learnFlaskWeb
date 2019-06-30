@@ -53,7 +53,7 @@
                 "FLASK_APP": "${workspaceFolder}/flasky.py"
             },
             "args": [
-                "test",
+                "run",
                 "--no-debugger",
                 "--no-reload"
             ],
